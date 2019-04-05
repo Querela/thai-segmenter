@@ -405,8 +405,6 @@ def main(args=None):
 
             args.column -= 1
 
-    raise SystemExit("WIP")
-
     if args.task == "clean":
         run_clean(args)
     elif args.task == "sentseg":
