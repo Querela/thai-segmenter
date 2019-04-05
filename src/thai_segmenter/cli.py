@@ -105,6 +105,9 @@ def line_cleaner(
         summary["keep"] = num_keep
 
 
+# ------------------------------------
+
+
 def tokenize(segmenter, sentence):
     words = segmenter.wp.word_segment_words(sentence)
     words_escd = segmenter.wp.clean_special_characters(words)
@@ -136,6 +139,122 @@ def tokenize_and_postag(segmenter, sentence, tri_gram=False):
     return segmenter.sentence.sentence(sentence, tokens_and_pos)
 
 
+def line_sentence_segmenter(lines, summary=None):
+    from thai_segmenter import sentence_segment
+
+    segmenter = sentence_segment()
+
+    num_lines = num_headers = num_segmented = num_sentences = 0
+
+    for line in lines:
+        num_lines += 1
+        line = line.strip()
+
+        if is_head_line(line):
+            num_headers += 1
+            yield line
+            continue
+
+        # sentence segment
+        sentences = segmenter.sentence_segment(line)
+        if len(sentences) > 1:
+            num_segmented += 1
+        num_sentences += len(sentences)
+
+        for sentence in sentences:
+            yield str(sentence)
+
+    if isinstance(summary, dict):
+        summary["lines"] = num_lines
+        summary["headers"] = num_headers
+        summary["sentences"] = num_sentences
+        summary["segmented"] = num_segmented
+
+
+def line_tokenizer(lines, column=None, summary=None):
+    from thai_segmenter import sentence_segment
+
+    segmenter = sentence_segment()
+
+    num_lines = num_headers = num_sentences = num_tokens = 0
+
+    for line in lines:
+        num_lines += 1
+        line = line.strip()
+
+        if is_head_line(line):
+            num_headers += 1
+            yield line
+            continue
+
+        if column is not None:
+            # TODO: how often to split
+            parts = line.split("\t")
+            pre_parts = [p for i, p in enumerate(parts) if i < column]
+            main_part = parts[column]
+            post_parts = [p for i, p in enumerate(parts) if i > column]
+
+        # tokenize
+        tokens = tokenize(segmenter, main_part)
+
+        num_sentences += 1
+        num_tokens += len(tokens)
+
+        sentence_tok = " ".join(tokens)
+        parts = pre_parts + [sentence_tok] + post_parts
+        line_out = "\t".join(parts)
+
+        yield line_out
+
+    if isinstance(summary, dict):
+        summary["lines"] = num_lines
+        summary["headers"] = num_headers
+        summary["sentences"] = num_sentences
+        summary["tokens"] = num_tokens
+
+
+def line_tokenize_and_tagger(lines, column=None, summary=None):
+    from thai_segmenter import sentence_segment
+
+    segmenter = sentence_segment()
+
+    num_lines = num_headers = num_sentences = num_tokens = 0
+
+    for line in lines:
+        num_lines += 1
+        line = line.strip()
+
+        if is_head_line(line):
+            num_headers += 1
+            yield line
+            continue
+
+        if column is not None:
+            # TODO: how often to split
+            parts = line.split("\t")
+            pre_parts = [p for i, p in enumerate(parts) if i < column]
+            main_part = parts[column]
+            post_parts = [p for i, p in enumerate(parts) if i > column]
+
+        # tokenize and pos-tag
+        sentence = tokenize_and_postag(segmenter, main_part)
+
+        num_sentences += 1
+        num_tokens += len(sentence)
+
+        sentence_tagged = " ".join("{}|{}".format(w, p) for w, p in sentence.pos)
+        parts = pre_parts + [sentence_tagged] + post_parts
+        line_out = "\t".join(parts)
+
+        yield line_out
+
+    if isinstance(summary, dict):
+        summary["lines"] = num_lines
+        summary["headers"] = num_headers
+        summary["sentences"] = num_sentences
+        summary["tokens"] = num_tokens
+
+
 # ----------------------------------------------------------------------------
 
 
@@ -160,137 +279,38 @@ def run_clean(args):
 
 
 def run_sentence_segmentation(args):
-    from thai_segmenter import sentence_segment  # noqa: F401
-
-    segmenter = sentence_segment()
-
     infile, outfile = args.input, args.output
 
-    num_lines = num_headers = num_sentences = num_segmented = 0
+    summary = dict() if args.collect_stats else None
 
-    for line in infile:
-        num_lines += 1
-        line = line.strip()
-
-        if is_head_line(line):
-            num_headers += 1
-            outfile.write(line + "\n")
-            continue
-
-        # segment
-        sentences = segmenter.sentence_segment(line)
-        if len(sentences) > 1:
-            num_segmented += 1
-        num_sentences += len(sentences)
-
-        for sentence in sentences:
-            outfile.write(str(sentence) + "\n")
+    for line in line_sentence_segmenter(infile, summary):
+        outfile.write(line + "\n")
 
     if args.collect_stats:
-        summary = dict(
-            lines=num_lines,
-            headers=num_headers,
-            segmented=num_segmented,
-            sentences=num_sentences,
-        )
         print(summary, file=sys.stderr)
 
 
 def run_tokenize(args):
-    from thai_segmenter import sentence_segment  # noqa: F401
-
-    segmenter = sentence_segment()
-
     infile, outfile = args.input, args.output
-    column = args.column
 
-    num_lines = num_headers = num_sentences = num_segmented = num_tokens = 0
+    summary = dict() if args.collect_stats else None
 
-    for line in infile:
-        num_lines += 1
-        line = line.strip()
-
-        if is_head_line(line):
-            num_headers += 1
-            outfile.write(line + "\n")
-            continue
-
-        if column is not None:
-            # TODO: how often to split
-            parts = line.split("\t")
-            pre_parts = [p for i, p in enumerate(parts) if i < column]
-            main_part = parts[column]
-            post_parts = [p for i, p in enumerate(parts) if i > column]
-
-        # tokenize
-        tokens = tokenize(segmenter, main_part)
-
-        num_sentences += 1
-        num_tokens += len(tokens)
-
-        sentence_tok = " ".join(tokens)
-        parts = pre_parts + [sentence_tok] + post_parts
-        line_out = "\t".join(parts) + "\n"
-
-        outfile.write(line_out)
+    for line in line_tokenizer(infile, args.column, summary):
+        outfile.write(line + "\n")
 
     if args.collect_stats:
-        summary = dict(
-            lines=num_lines,
-            headers=num_headers,
-            segmented=num_segmented,
-            sentences=num_sentences,
-            tokens=num_tokens,
-        )
         print(summary, file=sys.stderr)
 
 
 def run_tokenize_postag(args):
-    from thai_segmenter import sentence_segment  # noqa: F401
-
-    segmenter = sentence_segment()
-
     infile, outfile = args.input, args.output
-    column = args.column
 
-    num_lines = num_headers = num_sentences = num_segmented = num_tokens = 0
+    summary = dict() if args.collect_stats else None
 
-    for line in infile:
-        num_lines += 1
-        line = line.strip()
-
-        if is_head_line(line):
-            num_headers += 1
-            outfile.write(line + "\n")
-            continue
-
-        if column is not None:
-            # TODO: how often to split
-            parts = line.split("\t")
-            pre_parts = [p for i, p in enumerate(parts) if i < column]
-            main_part = parts[column]
-            post_parts = [p for i, p in enumerate(parts) if i > column]
-
-        # tokenize and pos-tag
-        sentence = tokenize_and_postag(segmenter, main_part)
-
-        num_sentences += 1
-        num_tokens += len(sentence)
-
-        sentence_tagged = " ".join("{}|{}".format(w, p) for w, p in sentence.pos)
-        parts = pre_parts + [sentence_tagged] + post_parts
-        line_out = "\t".join(parts) + "\n"
-
-        outfile.write(line_out)
+    for line in line_tokenize_and_tagger(infile, args.column, summary):
+        outfile.write(line + "\n")
 
     if args.collect_stats:
-        summary = dict(
-            lines=num_lines,
-            headers=num_headers,
-            segmented=num_segmented,
-            sentences=num_sentences,
-            tokens=num_tokens,
-        )
         print(summary, file=sys.stderr)
 
 
