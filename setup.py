@@ -218,7 +218,7 @@ def read(*names, **kwargs):
 
 setup(
     name="thai-segmenter",
-    version="version='0.2.1'",
+    version="version='0.2.2'",
     license="MIT license",
     description="Thai tokenizer, POS-tagger and sentence segmenter.",
     long_description="%s\n%s"
