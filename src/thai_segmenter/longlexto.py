@@ -44,7 +44,6 @@ import codecs
 import os.path
 import sys
 import threading
-import typing  # noqa: F401
 
 
 class Trie(object):
@@ -56,7 +55,7 @@ class Trie(object):
     >>> dict.contains(string)  # Check if contain string, return: freq if word, 0 if prefix, -1 otherwise
     """
 
-    def __init__(self, char: str = "\u00fb"):
+    def __init__(self, char="\u00fb"):
         """Creates a Trie using the specified character.
         Defaults to a root symbol as the character (0xFB / 251).
         """
@@ -66,15 +65,15 @@ class Trie(object):
         self.is_word = False
 
     @staticmethod
-    def _create_node(char: str) -> object:
+    def _create_node(char):
         """Used to create the trie nodes when a string is added to a trie. Returns the trie."""
         return Trie(char)
 
-    def add_child(self, trie: object):
+    def add_child(self, trie):
         """Inserts the trie as the last child."""
         self.insert_child(trie, len(self.children))
 
-    def insert_child(self, trie, index: int):
+    def insert_child(self, trie, index):
         """Inserts the trie at the specified index.
         If successful, the parent of the specified trie is updated to be this trie.
         Raises exceptions on invalid inputs."""
@@ -92,7 +91,7 @@ class Trie(object):
         trie.parent = self
         self.children.insert(index, trie)
 
-    def is_descendent(self, trie: object) -> bool:
+    def is_descendent(self, trie):
         """Returns true if this node is a descendent of the specified node or this node and the specified
         node are the same node, false otherwise."""
         trie2 = self
@@ -104,12 +103,12 @@ class Trie(object):
 
     # ------------------ End of tree-level operations.  Start of string operations. ------------------
 
-    def add(self, string: str) -> bool:
+    def add(self, string):
         """Adds the string to the trie.
         Returns true if the string is added or false if the string is already contained in the trie."""
         return self._add(string, 0)
 
-    def _add(self, string: str, index: int = 0) -> bool:
+    def _add(self, string, index=0):
         """[Internal function] Adds the string to the trie.
         Returns true if the string is added or false if the string is already contained in the trie."""
         if index == len(string):
@@ -140,7 +139,7 @@ class Trie(object):
 
         return True
 
-    def get_node_by_char(self, char: str) -> object:
+    def get_node_by_char(self, char):
         """Returns the child that has the specified character or null if no child has the specified character."""
         for child in self.children:
             if child.char != char:
@@ -148,12 +147,12 @@ class Trie(object):
             return child
         return None
 
-    def get_node(self, string: str) -> object:
+    def get_node(self, string):
         """Returns the last trie in the path that prefix matches the specified prefix string
         rooted at this node, or null if there is no such prefix path."""
         return self._get_node(string, 0)
 
-    def _get_node(self, string: str, index: int = 0) -> object:
+    def _get_node(self, string, index=0):
         """[Internal function] Returns the last trie in the path
         that prefix matches the specified prefix string rooted at this node,
         or null if there is no such prefix path."""
@@ -168,7 +167,7 @@ class Trie(object):
             )  # pylint: disable=protected-access
         return None
 
-    def size(self) -> int:
+    def size(self):
         """Returns the number of nodes that define isWord as true,
         starting at this node and including all of its descendents.
         This operation requires traversing the tree rooted at this node."""
@@ -179,7 +178,7 @@ class Trie(object):
             num += child.size()
         return num
 
-    def get_words(self, string: str) -> list:
+    def get_words(self, string):
         """Returns all of the words in the trie that begin with the specified prefix rooted at this node.
         An array of length 0 is returned if there are no words that begin with the specified prefix."""
         trie = self._get_node(string)
@@ -187,7 +186,7 @@ class Trie(object):
             return list()
         return trie._get_words_list()  # pylint: disable=protected-access
 
-    def _get_words_list(self) -> list:
+    def _get_words_list(self):
         """[Internal function] Returns all of the words in the trie
         that begin with the specified prefix (rooted at this node?)."""
         arrstring = list()
@@ -201,7 +200,7 @@ class Trie(object):
 
         return arrstring
 
-    def has_prefix(self, string: str) -> bool:
+    def has_prefix(self, string):
         """Returns true if the specified string has a prefix path starting at this node.
         Otherwise false is returned."""
         trie = self._get_node(string)
@@ -209,7 +208,7 @@ class Trie(object):
             return False
         return True
 
-    def contains(self, string: str) -> int:
+    def contains(self, string):
         """Check if the specified string is in the trie.
         Return value 1 if contains, 0 if has_prefix, else -1"""
         trie = self._get_node(string)
@@ -219,7 +218,7 @@ class Trie(object):
             return 1
         return 0
 
-    def has_char(self, char: str) -> bool:
+    def has_char(self, char):
         """Returns true if this node has a child with the specified character."""
         for child in self.children:
             if child.char != char:
@@ -227,7 +226,7 @@ class Trie(object):
             return True
         return False
 
-    def get_height(self) -> int:
+    def get_height(self):
         """Returns the number of nodes from this node up to the root node.
         The root node has height 0."""
         height = -1
@@ -237,7 +236,7 @@ class Trie(object):
             trie = trie.parent
         return height
 
-    def __str__(self) -> str:
+    def __str__(self):
         """Returns a string containing the characters on the path from this node to the root,
         but not including the root character.  The last character in the returned string is the
         character at this node."""
@@ -250,7 +249,7 @@ class Trie(object):
 
 
 class LongParseTree(object):
-    def __init__(self, trie: object, index_list: list, type_list: list):
+    def __init__(self, trie, index_list, type_list):
         self.dict_ = trie  # For storing words from dictionary
         self.index_list = index_list  # List of index positions
         self.type_list = type_list  # List of word types
@@ -287,7 +286,7 @@ class LongParseTree(object):
         # Adding ending characters
         self.ending_char = ["\u0e46", "\u0e2f"]
 
-    def next_word_valid(self, begin_pos: int, string: str) -> bool:
+    def next_word_valid(self, begin_pos, string):
         if begin_pos == len(string):
             return True
         if string[begin_pos] <= "~":  # English alphabets/digits/special characters
@@ -300,7 +299,7 @@ class LongParseTree(object):
                 break
         return False
 
-    def parse_word_instance(self, begin_pos: int, string: str) -> int:
+    def parse_word_instance(self, begin_pos, string):
         prev_char = "\u0000"
         longest_pos = -1  # longest_pos
         longest_valid_pos = -1  # Longest valid position
@@ -383,7 +382,7 @@ class LongLexTo(object):
         3 = English/digits
         4 = special characters"""
 
-    def __init__(self, dict_file: str = "lexitron.txt", raise_errors: bool = False):
+    def __init__(self, dict_file="lexitron.txt", raise_errors=False):
         """Constructor with an (optional default) dictionary file.
         Set raise_errors to True if you want Python to raise Exceptions instead of stderr messages."""
         self._lock = threading.RLock()  # to block concurrent access
@@ -411,7 +410,7 @@ class LongLexTo(object):
         # Parsing tree (for Thai words)
         self.ptree = LongParseTree(self.dict_, self.index_list, self.type_list)
 
-    def add_dict(self, dict_file: str):
+    def add_dict(self, dict_file):
         """Add dictionary (e.g., unknown-word file).
         Reads words per line from given file."""
         with codecs.open(
@@ -422,7 +421,7 @@ class LongLexTo(object):
                 if line:
                     self.dict_.add(line)
 
-    def word_instance(self, text: str):
+    def word_instance(self, text):
         """Word tokenization."""
         with self._lock:
             # important: this method of clearing because self.ptree has references to those lists
@@ -475,7 +474,7 @@ class LongLexTo(object):
 
             self.iter_ = iter(self.index_list)
 
-    def line_instance(self, text: str):
+    def line_instance(self, text):
         """Line-break tokenization."""
         with self._lock:
             window_size = 10  # for detecting parentheses, quotes
@@ -551,7 +550,7 @@ class LongLexTo(object):
 
             self.iter_ = iter(self.line_list)
 
-    def get_words(self, line: str):
+    def get_words(self, line):
         """(Word-)Tokenizes the given string and yield the tokens."""
         with self._lock:
             self.word_instance(line)
@@ -561,9 +560,7 @@ class LongLexTo(object):
                 begin = end
 
     @classmethod
-    def create(
-        cls, dict_file: str = "lexitron.txt", unknown_dict_file: str = "unknown.txt"
-    ) -> object:
+    def create(cls, dict_file="lexitron.txt", unknown_dict_file="unknown.txt"):
         """Static method to build the tokenizer with default dict files."""
         tokenizer = cls(dict_file)
         if os.path.exists(unknown_dict_file):
@@ -575,9 +572,9 @@ def main(args):
     """Dummy method as example use case."""
     tokenizer = LongLexTo.create()
 
-    in_file_name: str = args[1].strip()  # sys.stdin
+    in_file_name = args[1].strip()  # sys.stdin
     # System.getProperty("user.dir") + "//" + in_file_name
-    lines: list = list()
+    lines = list()
     with codecs.open(
         in_file_name, "r", encoding="utf-8"
     ) as fr:  # pylint: disable=invalid-name

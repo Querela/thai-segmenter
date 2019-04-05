@@ -9,6 +9,9 @@ matrix:
     - python: '3.6'
       env:
         - TOXENV=check
+    - python: '3.4'
+      env:
+        - TOXENV=py34,report,coveralls
     - python: '3.5'
       env:
         - TOXENV=py35,report,coveralls

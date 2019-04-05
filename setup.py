@@ -273,7 +273,7 @@ setup(
         "longlexto",
         "orchid",
     ],
-    python_requires=">=3.5",
+    python_requires=">=3.4",
     # $ pip install -e .
     install_requires=[
         # eg: 'aspectlib==1.1.1', 'six>=1.7',

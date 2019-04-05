@@ -19,19 +19,30 @@ import sys
 
 
 def run_clean(args):
-    pass
+    # from thai-word-segmentation repo
+    THAI_CHARS = [  # noqa: F841
+        chr(x)
+        for x in list(range(0x0E01, 0x0E3A))
+        + list(range(0x0E3F, 0x0E4D))
+        + list(range(0x0E50, 0x0E5A))
+    ]
+    # https://www.compart.com/de/unicode/scripts/Thai
+    THAI_CHARS2 = [  # noqa: F841
+        chr(x) for x in list(range(0x0E01, 0x0E3B)) + list(range(0x0E40, 0x0E5C))
+    ]
+    ASCII_CHARS = [chr(x) for x in [0] + [0x000A] + list(range(0x0020, 0x007F))]  # noqa: F841
 
 
 def run_sentence_segmentation(args):
-    pass
+    from thai_segmenter import sentence_segment  # noqa: F401
 
 
 def run_tokenize(args):
-    pass
+    from thai_segmenter import sentence_segment  # noqa: F401
 
 
 def run_tokenize_postag(args):
-    pass
+    from thai_segmenter import sentence_segment  # noqa: F401
 
 
 # ----------------------------------------------------------------------------
