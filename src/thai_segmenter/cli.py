@@ -172,6 +172,7 @@ def run_tokenize(args):
     segmenter = sentence_segment()
 
     infile, outfile = args.input, args.output
+    column = args.column
 
     num_lines = num_headers = num_sentences = num_segmented = num_tokens = 0
 
@@ -184,8 +185,15 @@ def run_tokenize(args):
             outfile.write(line + "\n")
             continue
 
+        if column is not None:
+            # TODO: how often to split
+            parts = line.split("\t")
+            pre_parts = [p for i, p in enumerate(parts) if i < column]
+            main_part = parts[column]
+            post_parts = [p for i, p in enumerate(parts) if i > column]
+
         # segment
-        sentences = segmenter.sentence_segment(line)
+        sentences = segmenter.sentence_segment(main_part)
         if len(sentences) > 1:
             num_segmented += 1
         num_sentences += len(sentences)
@@ -193,7 +201,11 @@ def run_tokenize(args):
         for sentence in sentences:
             num_tokens += len(sentence.pos)
             sentence_tok = " ".join(w for w, _ in sentence.pos)
-            outfile.write(sentence_tok + "\n")
+
+            parts = pre_parts + [sentence_tok] + post_parts
+            line_out = "\t".join(parts) + "\n"
+
+            outfile.write(line_out)
 
     if args.collect_stats:
         summary = dict(
@@ -212,6 +224,7 @@ def run_tokenize_postag(args):
     segmenter = sentence_segment()
 
     infile, outfile = args.input, args.output
+    column = args.column
 
     num_lines = num_headers = num_sentences = num_segmented = num_tokens = 0
 
@@ -224,8 +237,15 @@ def run_tokenize_postag(args):
             outfile.write(line + "\n")
             continue
 
+        if column is not None:
+            # TODO: how often to split
+            parts = line.split("\t")
+            pre_parts = [p for i, p in enumerate(parts) if i < column]
+            main_part = parts[column]
+            post_parts = [p for i, p in enumerate(parts) if i > column]
+
         # segment
-        sentences = segmenter.sentence_segment(line)
+        sentences = segmenter.sentence_segment(main_part)
         if len(sentences) > 1:
             num_segmented += 1
         num_sentences += len(sentences)
@@ -233,7 +253,11 @@ def run_tokenize_postag(args):
         for sentence in sentences:
             num_tokens += len(sentence.pos)
             sentence_tagged = " ".join("{}|{}".format(w, p) for w, p in sentence.pos)
-            outfile.write(sentence_tagged + "\n")
+
+            parts = pre_parts + [sentence_tagged] + post_parts
+            line_out = "\t".join(parts) + "\n"
+
+            outfile.write(line_out)
 
     if args.collect_stats:
         summary = dict(
@@ -277,6 +301,19 @@ def build_parser():
         help="Collect statistics (counters) and print to stderr at end.",
     )
 
+    shared_colselect_parser = argparse.ArgumentParser(add_help=False)
+    group = shared_colselect_parser.add_argument_group("Selection")
+    group.add_argument(
+        "-c",
+        "-f",
+        "--column",
+        "--field",
+        type=int,
+        dest="column",
+        default=None,
+        help="If supplied, then only do task on nth column of tab separated file. (1 == first column)",
+    )
+
     # ------------------------------------
     # - add sub commands
 
@@ -296,12 +333,12 @@ def build_parser():
     parser_tokenize = subparsers.add_parser(
         "tokenize",
         help="Tokenize input lines.",
-        parents=[shared_inout_parser, shared_stats_parser],
+        parents=[shared_inout_parser, shared_stats_parser, shared_colselect_parser],
     )
     parser_tokpos = subparsers.add_parser(
         "tokpos",
         help="Tokenize and POS-tag input lines.",
-        parents=[shared_inout_parser, shared_stats_parser],
+        parents=[shared_inout_parser, shared_stats_parser, shared_colselect_parser],
     )
 
     # ------------------------------------
@@ -356,6 +393,20 @@ def main(args=None):
     print("Run task: {}".format(args.task))
 
     print(args)
+
+    if args.task in ("tokenize", "tokpos"):
+        if isinstance(args.column, int):
+            if args.column < 1:
+                raise parser.error(
+                    "Column must be at least 1 or larger. (Counting starts at 1): value = {}".format(
+                        args.column
+                    )
+                )
+            # TODO: only till 3 ?
+
+            args.column -= 1
+
+    raise SystemExit("WIP")
 
     if args.task == "clean":
         run_clean(args)
