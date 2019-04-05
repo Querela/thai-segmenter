@@ -1,0 +1,23 @@
+[paths]
+source =
+   src
+   */site-packages
+
+[run]
+branch = true
+source =
+    thai_segmenter
+    tests
+parallel = true
+
+[report]
+show_missing = true
+precision = 2
+omit =
+    *migrations*
+    *.egg*
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
+def __repr__
