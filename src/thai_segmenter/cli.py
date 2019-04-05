@@ -105,6 +105,37 @@ def line_cleaner(
         summary["keep"] = num_keep
 
 
+def tokenize(segmenter, sentence):
+    words = segmenter.wp.word_segment_words(sentence)
+    words_escd = segmenter.wp.clean_special_characters(words)
+    _, tokens, _ = segmenter.clean_unknown_word(words_escd)
+    return tokens
+
+
+def tokenize_and_postag(segmenter, sentence, tri_gram=False):
+    # tokenize
+    words = segmenter.wp.word_segment_words(sentence)
+    words_escd = segmenter.wp.clean_special_characters(words)
+    to_be_tagged, tokens, replace_idx = segmenter.clean_unknown_word(words_escd)
+
+    # pos tag
+    # call viterbi function to get most possible pos sequence
+    initp, trans, emiss = segmenter.corpus.get_statistics_model(tri_gram)
+    if tri_gram:
+        path = segmenter.vtb.viterbi_trigram(
+            to_be_tagged, segmenter.corpus.pos_list_sentence, initp, trans, emiss
+        )
+    else:
+        path = segmenter.vtb.viterbi(
+            to_be_tagged, segmenter.corpus.pos_list_sentence, initp, trans, emiss
+        )
+    pos = segmenter.invert_unknown_word(tokens, path, replace_idx)
+
+    # make sentence object
+    tokens_and_pos = list((w, p if p != "SBS" else "NSBS") for w, p in zip(tokens, pos))
+    return segmenter.sentence.sentence(sentence, tokens_and_pos)
+
+
 # ----------------------------------------------------------------------------
 
 
@@ -191,20 +222,17 @@ def run_tokenize(args):
             main_part = parts[column]
             post_parts = [p for i, p in enumerate(parts) if i > column]
 
-        # segment
-        sentences = segmenter.sentence_segment(main_part)
-        if len(sentences) > 1:
-            num_segmented += 1
-        num_sentences += len(sentences)
+        # tokenize
+        tokens = tokenize(segmenter, main_part)
 
-        for sentence in sentences:
-            num_tokens += len(sentence.pos)
-            sentence_tok = " ".join(w for w, _ in sentence.pos)
+        num_sentences += 1
+        num_tokens += len(tokens)
 
-            parts = pre_parts + [sentence_tok] + post_parts
-            line_out = "\t".join(parts) + "\n"
+        sentence_tok = " ".join(tokens)
+        parts = pre_parts + [sentence_tok] + post_parts
+        line_out = "\t".join(parts) + "\n"
 
-            outfile.write(line_out)
+        outfile.write(line_out)
 
     if args.collect_stats:
         summary = dict(
@@ -243,20 +271,17 @@ def run_tokenize_postag(args):
             main_part = parts[column]
             post_parts = [p for i, p in enumerate(parts) if i > column]
 
-        # segment
-        sentences = segmenter.sentence_segment(main_part)
-        if len(sentences) > 1:
-            num_segmented += 1
-        num_sentences += len(sentences)
+        # tokenize and pos-tag
+        sentence = tokenize_and_postag(segmenter, main_part)
 
-        for sentence in sentences:
-            num_tokens += len(sentence.pos)
-            sentence_tagged = " ".join("{}|{}".format(w, p) for w, p in sentence.pos)
+        num_sentences += 1
+        num_tokens += len(sentence)
 
-            parts = pre_parts + [sentence_tagged] + post_parts
-            line_out = "\t".join(parts) + "\n"
+        sentence_tagged = " ".join("{}|{}".format(w, p) for w, p in sentence.pos)
+        parts = pre_parts + [sentence_tagged] + post_parts
+        line_out = "\t".join(parts) + "\n"
 
-            outfile.write(line_out)
+        outfile.write(line_out)
 
     if args.collect_stats:
         summary = dict(
