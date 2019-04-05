@@ -18,19 +18,86 @@ import argparse
 import sys
 
 
+# from thai-word-segmentation repo
+THAI_CHARS = [  # noqa: F841
+    chr(x)
+    for x in list(range(0x0E01, 0x0E3A))
+    + list(range(0x0E3F, 0x0E4D))
+    + list(range(0x0E50, 0x0E5A))
+]
+# https://www.compart.com/de/unicode/scripts/Thai
+THAI_CHARS2 = [  # noqa: F841
+    chr(x) for x in list(range(0x0E01, 0x0E3B)) + list(range(0x0E40, 0x0E5C))
+]
+ASCII_CHARS = [
+    chr(x) for x in [0] + [0x000A] + list(range(0x0020, 0x007F))
+]  # noqa: F841
+
+
+def contains_thai(line):  # type: (str) -> bool
+    """Checks whether a line contains at least one thai character."""
+    return any(c in THAI_CHARS2 for c in line)
+
+
+def is_head_line(
+    line, require_source_at_end=False, require_all_meta=False
+):  # type: (str) -> bool
+    """Check whether a line is a source document separator."""
+    if require_source_at_end and not line.strip().endswith("></source>"):
+        return False
+
+    if require_all_meta:
+        return (
+            line.startswith("<source><")
+            and "</source>" in line
+            and ("<date>" in line or "<datum>" in line)
+            and ("<location>" in line or "<name_lang>" in line)
+        )
+
+    return line.startswith("<source><")
+
+
+# ----------------------------------------------------------------------------
+
+
 def run_clean(args):
-    # from thai-word-segmentation repo
-    THAI_CHARS = [  # noqa: F841
-        chr(x)
-        for x in list(range(0x0E01, 0x0E3A))
-        + list(range(0x0E3F, 0x0E4D))
-        + list(range(0x0E50, 0x0E5A))
-    ]
-    # https://www.compart.com/de/unicode/scripts/Thai
-    THAI_CHARS2 = [  # noqa: F841
-        chr(x) for x in list(range(0x0E01, 0x0E3B)) + list(range(0x0E40, 0x0E5C))
-    ]
-    ASCII_CHARS = [chr(x) for x in [0] + [0x000A] + list(range(0x0020, 0x007F))]  # noqa: F841
+    skip_headers = args.has_source_headers
+    filter_blank = args.filter_blank
+    filter_non_thai = args.filter_non_thai
+    trim_whitespaces = args.trim_whitespaces
+    norm_whitespaces = args.normalize_whitespaces
+    infile, outfile = args.input, args.output
+
+    # TODO: output stats if cmd param?
+
+    import re
+
+    pattern_anywhitespace = re.compile(r"\s+")
+
+    for line in infile:
+        if skip_headers and is_head_line(line):
+            # if we check for headers, then output if found and continue
+            outfile.write(line)
+            continue
+
+        line_strip = line.strip()
+
+        if not line_strip:
+            if not filter_blank:
+                outfile.write(line_strip + "\n")
+            continue
+
+        if filter_non_thai and not contains_thai(line_strip):
+            # skip if filtering and no thai in line
+            continue
+
+        if trim_whitespaces:
+            line = line_strip
+
+        if norm_whitespaces:
+            line = pattern_anywhitespace.sub(" ", line_strip)
+
+        outfile.write(line + "\n")
 
 
 def run_sentence_segmentation(args):
@@ -107,6 +174,12 @@ def build_parser():
         action="store_false",
         dest="filter_non_thai",
         help="Keep lines not containing any thai characters.",
+    )
+    group.add_argument(
+        "--no-source-headers",
+        action="store_false",
+        dest="has_source_headers",
+        help="File has no source headers (else skip lines starting with '<source>').",
     )
     group.add_argument(
         "--no-trim-whitespaces",
