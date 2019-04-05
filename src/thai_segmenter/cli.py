@@ -84,25 +84,26 @@ def build_parser():
     # ------------------------------------
     # - clean command arguments
 
-    parser_clean.add_argument(
+    group = parser_clean.add_argument_group("Transformations")
+    group.add_argument(
         "--keep-blanks",
         action="store_false",
         dest="filter_blank",
         help="Don't filter blank/empty lines.",
     )
-    parser_clean.add_argument(
+    group.add_argument(
         "--keep-non-thai",
         action="store_false",
         dest="filter_non_thai",
-        help="Keep lines not containing thai characters.",
+        help="Keep lines not containing any thai characters.",
     )
-    parser_clean.add_argument(
+    group.add_argument(
         "--no-trim-whitespaces",
         action="store_false",
         dest="trim_whitespaces",
         help="Don't trim whitespaces at start/end of line.",
     )
-    parser_clean.add_argument(
+    group.add_argument(
         "--no-normalize-whitespaces",
         action="store_false",
         dest="normalize_whitespaces",

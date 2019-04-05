@@ -1,4 +1,3 @@
-
 from thai_segmenter.cli import main
 
 

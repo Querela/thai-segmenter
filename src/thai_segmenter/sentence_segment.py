@@ -6,9 +6,9 @@ import sys  # noqa: F401
 import time  # noqa: F401
 
 from thai_segmenter import orchid_corpus as orch
+from thai_segmenter import sentence as sentence
 from thai_segmenter import viterbi as vtb
 from thai_segmenter import word_processing as wp
-from thai_segmenter import sentence as sentence
 
 
 class sentence_segment:
