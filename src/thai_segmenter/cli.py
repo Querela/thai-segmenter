@@ -15,7 +15,11 @@ Why does this file exist, and why not put this in __main__?
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 import argparse
+import re
 import sys
+
+
+# ----------------------------------------------------------------------------
 
 
 # from thai-word-segmentation repo
@@ -57,59 +61,189 @@ def is_head_line(
     return line.startswith("<source><")
 
 
+def line_cleaner(
+    lines, skip_headers, filter_blank, filter_non_thai, norm_whitespaces, summary=None
+):
+    pattern_anywhitespace = re.compile(r"\s+")
+
+    num_lines = num_headers = num_blank = num_nonthai = num_keep = 0
+
+    for line in lines:
+        num_lines += 1
+        line = line.strip()
+
+        if skip_headers and is_head_line(line):
+            num_headers += 1  # TODO: count even if not enabled?
+            num_keep += 1
+            # if we check for headers, then output if found and continue
+            yield line
+            continue
+
+        if not line:
+            if not filter_blank:
+                num_blank += 1
+                num_keep += 1
+                yield line
+            continue
+
+        if filter_non_thai and not contains_thai(line):
+            num_nonthai += 1
+            # skip if filtering and no thai in line
+            continue
+
+        if norm_whitespaces:
+            line = pattern_anywhitespace.sub(" ", line)
+
+        num_keep += 1
+        yield line
+
+    # set summary at end
+    if isinstance(summary, dict):
+        summary["lines"] = num_lines
+        summary["headers"] = num_headers
+        summary["blank"] = num_blank
+        summary["nonthai"] = num_nonthai
+        summary["keep"] = num_keep
+
+
 # ----------------------------------------------------------------------------
 
 
 def run_clean(args):
-    skip_headers = args.has_source_headers
-    filter_blank = args.filter_blank
-    filter_non_thai = args.filter_non_thai
-    trim_whitespaces = args.trim_whitespaces
-    norm_whitespaces = args.normalize_whitespaces
     infile, outfile = args.input, args.output
 
     # TODO: output stats if cmd param?
+    summary = dict() if args.collect_stats else None
 
-    import re
-
-    pattern_anywhitespace = re.compile(r"\s+")
-
-    for line in infile:
-        if skip_headers and is_head_line(line):
-            # if we check for headers, then output if found and continue
-            outfile.write(line)
-            continue
-
-        line_strip = line.strip()
-
-        if not line_strip:
-            if not filter_blank:
-                outfile.write(line_strip + "\n")
-            continue
-
-        if filter_non_thai and not contains_thai(line_strip):
-            # skip if filtering and no thai in line
-            continue
-
-        if trim_whitespaces:
-            line = line_strip
-
-        if norm_whitespaces:
-            line = pattern_anywhitespace.sub(" ", line_strip)
-
+    for line in line_cleaner(
+        infile,
+        args.has_source_headers,
+        args.filter_blank,
+        args.filter_non_thai,
+        args.normalize_whitespaces,
+        summary=summary,
+    ):
         outfile.write(line + "\n")
+
+    if args.collect_stats:
+        print(summary, file=sys.stderr)
 
 
 def run_sentence_segmentation(args):
     from thai_segmenter import sentence_segment  # noqa: F401
 
+    segmenter = sentence_segment()
+
+    infile, outfile = args.input, args.output
+
+    num_lines = num_headers = num_sentences = num_segmented = 0
+
+    for line in infile:
+        num_lines += 1
+        line = line.strip()
+
+        if is_head_line(line):
+            num_headers += 1
+            outfile.write(line + "\n")
+            continue
+
+        # segment
+        sentences = segmenter.sentence_segment(line)
+        if len(sentences) > 1:
+            num_segmented += 1
+        num_sentences += len(sentences)
+
+        for sentence in sentences:
+            outfile.write(str(sentence) + "\n")
+
+    if args.collect_stats:
+        summary = dict(
+            lines=num_lines,
+            headers=num_headers,
+            segmented=num_segmented,
+            sentences=num_sentences,
+        )
+        print(summary, file=sys.stderr)
+
 
 def run_tokenize(args):
     from thai_segmenter import sentence_segment  # noqa: F401
 
+    segmenter = sentence_segment()
+
+    infile, outfile = args.input, args.output
+
+    num_lines = num_headers = num_sentences = num_segmented = num_tokens = 0
+
+    for line in infile:
+        num_lines += 1
+        line = line.strip()
+
+        if is_head_line(line):
+            num_headers += 1
+            outfile.write(line + "\n")
+            continue
+
+        # segment
+        sentences = segmenter.sentence_segment(line)
+        if len(sentences) > 1:
+            num_segmented += 1
+        num_sentences += len(sentences)
+
+        for sentence in sentences:
+            num_tokens += len(sentence.pos)
+            sentence_tok = " ".join(w for w, _ in sentence.pos)
+            outfile.write(sentence_tok + "\n")
+
+    if args.collect_stats:
+        summary = dict(
+            lines=num_lines,
+            headers=num_headers,
+            segmented=num_segmented,
+            sentences=num_sentences,
+            tokens=num_tokens,
+        )
+        print(summary, file=sys.stderr)
+
 
 def run_tokenize_postag(args):
     from thai_segmenter import sentence_segment  # noqa: F401
+
+    segmenter = sentence_segment()
+
+    infile, outfile = args.input, args.output
+
+    num_lines = num_headers = num_sentences = num_segmented = num_tokens = 0
+
+    for line in infile:
+        num_lines += 1
+        line = line.strip()
+
+        if is_head_line(line):
+            num_headers += 1
+            outfile.write(line + "\n")
+            continue
+
+        # segment
+        sentences = segmenter.sentence_segment(line)
+        if len(sentences) > 1:
+            num_segmented += 1
+        num_sentences += len(sentences)
+
+        for sentence in sentences:
+            num_tokens += len(sentence.pos)
+            sentence_tagged = " ".join("{}|{}".format(w, p) for w, p in sentence.pos)
+            outfile.write(sentence_tagged + "\n")
+
+    if args.collect_stats:
+        summary = dict(
+            lines=num_lines,
+            headers=num_headers,
+            segmented=num_segmented,
+            sentences=num_sentences,
+            tokens=num_tokens,
+        )
+        print(summary, file=sys.stderr)
 
 
 # ----------------------------------------------------------------------------
@@ -134,6 +268,15 @@ def build_parser():
         help="Output file.",
     )
 
+    shared_stats_parser = argparse.ArgumentParser(add_help=False)
+    group = shared_stats_parser.add_argument_group("In-/Output")
+    group.add_argument(
+        "--stats",
+        action="store_true",
+        dest="collect_stats",
+        help="Collect statistics (counters) and print to stderr at end.",
+    )
+
     # ------------------------------------
     # - add sub commands
 
@@ -143,20 +286,22 @@ def build_parser():
     parser_clean = subparsers.add_parser(
         "clean",
         help="Clean input from non-thai and blank lines.",
-        parents=[shared_inout_parser],
+        parents=[shared_inout_parser, shared_stats_parser],
     )
     parser_sentseg = subparsers.add_parser(
         "sentseg",
         help="Sentence segmentize input lines.",
-        parents=[shared_inout_parser],
+        parents=[shared_inout_parser, shared_stats_parser],
     )
     parser_tokenize = subparsers.add_parser(
-        "tokenize", help="Tokenize input lines.", parents=[shared_inout_parser]
+        "tokenize",
+        help="Tokenize input lines.",
+        parents=[shared_inout_parser, shared_stats_parser],
     )
     parser_tokpos = subparsers.add_parser(
         "tokpos",
         help="Tokenize and POS-tag input lines.",
-        parents=[shared_inout_parser],
+        parents=[shared_inout_parser, shared_stats_parser],
     )
 
     # ------------------------------------
@@ -180,12 +325,6 @@ def build_parser():
         action="store_false",
         dest="has_source_headers",
         help="File has no source headers (else skip lines starting with '<source>').",
-    )
-    group.add_argument(
-        "--no-trim-whitespaces",
-        action="store_false",
-        dest="trim_whitespaces",
-        help="Don't trim whitespaces at start/end of line.",
     )
     group.add_argument(
         "--no-normalize-whitespaces",
