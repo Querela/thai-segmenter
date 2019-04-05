@@ -44,7 +44,7 @@ import codecs
 import os.path
 import sys
 import threading
-import typing
+import typing  # noqa: F401
 
 
 class Trie(object):
