@@ -44,6 +44,7 @@ import codecs
 import os.path
 import sys
 import threading
+import typing
 
 
 class Trie(object):

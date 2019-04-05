@@ -9,18 +9,18 @@ matrix:
     - python: '3.6'
       env:
         - TOXENV=check
-#    - python: '3.5'
-#      env:
-#        - TOXENV=py35,report,coveralls
+    - python: '3.5'
+      env:
+        - TOXENV=py35,report,coveralls
     - python: '3.6'
       env:
         - TOXENV=py36,report,coveralls
     - python: '3.7'
       env:
         - TOXENV=py37,report,coveralls
-#    - python: 'pypy3.5-6.0'
-#      env:
-#        - TOXENV=pypy3,report,coveralls
+    - python: 'pypy3.5-6.0'
+      env:
+        - TOXENV=pypy3,report,coveralls
 before_install:
   - python --version
   - uname -a

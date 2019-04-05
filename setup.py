@@ -10,10 +10,12 @@ import io
 import os
 import re
 import subprocess
-
 from distutils import dir_util
 from distutils.command.clean import clean as _CleanCommand  # noqa: N812
-from setuptools import find_packages, setup, Command
+
+from setuptools import Command
+from setuptools import find_packages
+from setuptools import setup
 
 
 class CleanCommand(_CleanCommand):
@@ -265,8 +267,15 @@ setup(
     },
     keywords=[
         # eg: 'keyword1', 'keyword2', 'keyword3',
+        "thai",
+        "nlp",
+        "sentence segmentation",
+        "tokenize",
+        "pos-tag",
+        "longlexto",
+        "orchid",
     ],
-    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+    python_requires=">=3.6",
     # $ pip install -e .
     install_requires=[
         # eg: 'aspectlib==1.1.1', 'six>=1.7',
@@ -280,6 +289,7 @@ setup(
     # $ coverage html
     # $ coverage erase
     # $ prospector
+    # mypy / pytype ?
     # $ python setup.py check -r -s
     extras_require={
         # eg:
