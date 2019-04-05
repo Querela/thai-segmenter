@@ -20,4 +20,4 @@ exclude_lines =
     pragma: no cover
     if __name__ == .__main__.:
     raise NotImplementedError
-def __repr__
+	def __repr__
