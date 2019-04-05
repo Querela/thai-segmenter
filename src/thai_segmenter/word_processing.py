@@ -31,6 +31,8 @@ class word_processing:
             "-": "<minus>",
             "(": "<left_parenthesis>",
             ")": "<right_parenthesis>",
+            "[": "<left_bracket>",
+            "]": "<right_bracket>",
             "*": "<asterisk>",
             ".": "<full_stop>",
             '"': "<quotation>",

@@ -140,7 +140,7 @@ def tokenize_and_postag(segmenter, sentence, tri_gram=False):
 
 
 def line_sentence_segmenter(lines, summary=None):
-    from thai_segmenter import sentence_segment
+    from thai_segmenter.sentence_segment import sentence_segment
 
     segmenter = sentence_segment()
 
@@ -149,6 +149,9 @@ def line_sentence_segmenter(lines, summary=None):
     for line in lines:
         num_lines += 1
         line = line.strip()
+
+        if not line:
+            continue
 
         if is_head_line(line):
             num_headers += 1
@@ -172,15 +175,18 @@ def line_sentence_segmenter(lines, summary=None):
 
 
 def line_tokenizer(lines, column=None, summary=None):
-    from thai_segmenter import sentence_segment
+    import thai_segmenter.sentence_segment
 
-    segmenter = sentence_segment()
+    segmenter = thai_segmenter.sentence_segment.sentence_segment()
 
     num_lines = num_headers = num_sentences = num_tokens = 0
 
     for line in lines:
         num_lines += 1
         line = line.strip()
+
+        if not line:
+            continue
 
         if is_head_line(line):
             num_headers += 1
@@ -193,6 +199,9 @@ def line_tokenizer(lines, column=None, summary=None):
             pre_parts = [p for i, p in enumerate(parts) if i < column]
             main_part = parts[column]
             post_parts = [p for i, p in enumerate(parts) if i > column]
+        else:
+            pre_parts, post_parts = list(), list()
+            main_part = line
 
         # tokenize
         tokens = tokenize(segmenter, main_part)
@@ -214,15 +223,20 @@ def line_tokenizer(lines, column=None, summary=None):
 
 
 def line_tokenize_and_tagger(lines, column=None, summary=None):
-    from thai_segmenter import sentence_segment
+    import thai_segmenter.sentence_segment
 
-    segmenter = sentence_segment()
+    segmenter = thai_segmenter.sentence_segment.sentence_segment()
+    segmenter.sentence = thai_segmenter.sentence_segment.sentence
+    segmenter.vtb = thai_segmenter.sentence_segment.vtb
 
     num_lines = num_headers = num_sentences = num_tokens = 0
 
     for line in lines:
         num_lines += 1
         line = line.strip()
+
+        if not line:
+            continue
 
         if is_head_line(line):
             num_headers += 1
@@ -235,12 +249,15 @@ def line_tokenize_and_tagger(lines, column=None, summary=None):
             pre_parts = [p for i, p in enumerate(parts) if i < column]
             main_part = parts[column]
             post_parts = [p for i, p in enumerate(parts) if i > column]
+        else:
+            pre_parts, post_parts = list(), list()
+            main_part = line
 
         # tokenize and pos-tag
         sentence = tokenize_and_postag(segmenter, main_part)
 
         num_sentences += 1
-        num_tokens += len(sentence)
+        num_tokens += len(sentence.pos)
 
         sentence_tagged = " ".join("{}|{}".format(w, p) for w, p in sentence.pos)
         parts = pre_parts + [sentence_tagged] + post_parts
