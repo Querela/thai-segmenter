@@ -281,6 +281,7 @@ setup(
     # $ pip install -e .[dev]
     # $ flake8 *.py
     # $ pylint *.py
+    # $ isort --verbose --check-only --diff *.py
     # $ pyment -q "'''" *.py
     # $ coverage report --skip-covered
     # $ coverage html
