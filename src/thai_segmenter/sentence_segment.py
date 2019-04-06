@@ -12,6 +12,7 @@ from thai_segmenter import word_processing as wp
 
 
 class sentence_segment:
+    data_dir = "tools"
     filename_lexitron = "lexitron_original.txt"
     filename_dictionary = "custom_dict_word.txt"
     filename_orchid = "orchid_words.txt"
@@ -32,7 +33,9 @@ class sentence_segment:
     def set_custom_dict(self, custom_dict):
         word_list = set()
         filename = os.path.join(
-            os.path.dirname(__file__), "tools", sentence_segment.filename_lexitron
+            os.path.dirname(__file__),
+            sentence_segment.data_dir,
+            sentence_segment.filename_lexitron,
         )
         with codecs.open(filename, "r", encoding="utf-8") as f:
             for line in f:
@@ -41,7 +44,9 @@ class sentence_segment:
             word_list.add(word)
 
         filename = os.path.join(
-            os.path.dirname(__file__), "tools", sentence_segment.filename_dictionary
+            os.path.dirname(__file__),
+            sentence_segment.data_dir,
+            sentence_segment.filename_dictionary,
         )
         with codecs.open(filename, "w", encoding="utf-8") as f:
             for word in word_list:

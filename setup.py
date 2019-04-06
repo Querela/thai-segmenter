@@ -218,15 +218,14 @@ def read(*names, **kwargs):
 
 setup(
     name="thai-segmenter",
-    version="version='0.2.2'",
+    version="0.2.2",
     license="MIT license",
     description="Thai tokenizer, POS-tagger and sentence segmenter.",
-    long_description="%s\n%s"
-    % (
-        re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
+    long_description="{readme}\n{changelog}".format(
+        readme=re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
             "", read("README.rst")
         ),
-        re.sub(":[a-z]+:`~?(.*?)`", r"``\1``", read("CHANGELOG.rst")),
+        changelog=re.sub(":[a-z]+:`~?(.*?)`", r"``\1``", read("CHANGELOG.rst")),
     ),
     author="Erik Körner",  # \xf6
     author_email="koerner@informatik.uni-leipzig.de",

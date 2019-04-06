@@ -21,8 +21,10 @@ class word_processing:
         self.dict_dir = os.path.join(self.cwd, "tools")
 
         dict_file = os.path.join(self.dict_dir, word_processing.filename_lexitron)
+
         shutil.copyfile(os.path.join(self.dict_dir, dict_file_paragraph), dict_file)
         self.tokenizer_words = longlexto.LongLexTo.create(dict_file=dict_file)
+
         shutil.copyfile(os.path.join(self.dict_dir, dict_file_words), dict_file)
         self.tokenizer_subwords = longlexto.LongLexTo.create(dict_file=dict_file)
 
@@ -45,6 +47,7 @@ class word_processing:
             ">": "<greater_than>",
             "&": "<ampersand>",
             "{": "<left_curly_bracket>",
+            "|": "<pipe>",
             "}": "<right_curly_bracket>",
             "'": "<apostrophe>",
             "+": "<plus>",
@@ -112,9 +115,9 @@ class word_processing:
 
     def clean_special_characters(self, st):
         sentence = [word for word in st]
-        word_count = len(sentence)
-        for i in range(word_count):
-            if sentence[i] in self.special:
-                sentence[i] = self.special[sentence[i]]
+
+        for i, word in enumerate(sentence):
+            if word in self.special:
+                sentence[i] = self.special[word]
 
         return sentence
