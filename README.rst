@@ -26,9 +26,9 @@ Overview
     :alt: PyPI Package latest release
     :target: https://pypi.org/project/thai-segmenter
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/Querela/thai-segmenter/v0.2.2.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/Querela/thai-segmenter/v0.3.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/Querela/thai-segmenter/compare/v0.2.2...master
+    :target: https://github.com/Querela/thai-segmenter/compare/v0.3.0...master
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/thai-segmenter.svg
     :alt: PyPI Wheel
