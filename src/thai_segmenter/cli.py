@@ -46,7 +46,7 @@ def is_head_line(
     line, require_source_at_end=False, require_all_meta=False
 ):  # type: (str) -> bool
     """Check whether a line is a source document separator."""
-    if require_source_at_end and not line.strip().endswith("></source>"):
+    if require_source_at_end and not line.rstrip().endswith("></source>"):
         return False
 
     if require_all_meta:
@@ -108,6 +108,17 @@ def line_cleaner(
 # ------------------------------------
 
 
+def get_segmenter():
+    import thai_segmenter.sentence_segment
+
+    segmenter = thai_segmenter.sentence_segment.sentence_segment()
+    # TODO: maybe set in sentence_segment class
+    segmenter.sentence = thai_segmenter.sentence_segment.sentence
+    segmenter.vtb = thai_segmenter.sentence_segment.vtb
+
+    return segmenter
+
+
 def tokenize(segmenter, sentence):
     words = segmenter.wp.word_segment_words(sentence)
     words_escd = segmenter.wp.clean_special_characters(words)
@@ -139,10 +150,13 @@ def tokenize_and_postag(segmenter, sentence, tri_gram=False):
     return segmenter.sentence.sentence(sentence, tokens_and_pos)
 
 
-def line_sentence_segmenter(lines, summary=None):
-    from thai_segmenter.sentence_segment import sentence_segment
+def line_sentence_segmenter(
+    lines, has_headers=False, header_detect_fun=None, summary=None
+):
+    segmenter = get_segmenter()
 
-    segmenter = sentence_segment()
+    if not callable(header_detect_fun):
+        header_detect_fun = is_head_line
 
     num_lines = num_headers = num_segmented = num_sentences = 0
 
@@ -153,7 +167,7 @@ def line_sentence_segmenter(lines, summary=None):
         if not line:
             continue
 
-        if is_head_line(line):
+        if has_headers and header_detect_fun(line):
             num_headers += 1
             yield line
             continue
@@ -174,10 +188,64 @@ def line_sentence_segmenter(lines, summary=None):
         summary["segmented"] = num_segmented
 
 
-def line_tokenizer(lines, column=None, summary=None):
-    import thai_segmenter.sentence_segment
+def line_sentence_segmenter_column(
+    lines, column=None, has_headers=False, header_detect_fun=None, summary=None
+):
+    segmenter = get_segmenter()
 
-    segmenter = thai_segmenter.sentence_segment.sentence_segment()
+    if not callable(header_detect_fun):
+        header_detect_fun = is_head_line
+
+    num_lines = num_headers = num_segmented = num_sentences = 0
+
+    for line in lines:
+        num_lines += 1
+        line = line.strip()
+
+        if not line:
+            continue
+
+        if has_headers and header_detect_fun(line):
+            num_headers += 1
+            yield line
+            continue
+
+        if column is not None:
+            # TODO: how often to split
+            parts = line.split("\t")
+            pre_parts = [p for i, p in enumerate(parts) if i < column]
+            main_part = parts[column]
+            post_parts = [p for i, p in enumerate(parts) if i > column]
+        else:
+            pre_parts, post_parts = list(), list()
+            main_part = line
+
+        # sentence segment
+        sentences = segmenter.sentence_segment(main_part)
+        if len(sentences) > 1:
+            num_segmented += 1
+        num_sentences += len(sentences)
+
+        for sentence in sentences:
+            parts = pre_parts + [str(sentence)] + post_parts
+            line_out = "\t".join(parts)
+
+            yield line_out
+
+    if isinstance(summary, dict):
+        summary["lines"] = num_lines
+        summary["headers"] = num_headers
+        summary["sentences"] = num_sentences
+        summary["segmented"] = num_segmented
+
+
+def line_tokenizer(
+    lines, column=None, has_headers=False, header_detect_fun=None, summary=None
+):
+    segmenter = get_segmenter()
+
+    if not callable(header_detect_fun):
+        header_detect_fun = is_head_line
 
     num_lines = num_headers = num_sentences = num_tokens = 0
 
@@ -188,7 +256,7 @@ def line_tokenizer(lines, column=None, summary=None):
         if not line:
             continue
 
-        if is_head_line(line):
+        if has_headers and header_detect_fun(line):
             num_headers += 1
             yield line
             continue
@@ -222,12 +290,13 @@ def line_tokenizer(lines, column=None, summary=None):
         summary["tokens"] = num_tokens
 
 
-def line_tokenize_and_tagger(lines, column=None, summary=None):
-    import thai_segmenter.sentence_segment
+def line_tokenize_and_tagger(
+    lines, column=None, has_headers=False, header_detect_fun=None, summary=None
+):
+    segmenter = get_segmenter()
 
-    segmenter = thai_segmenter.sentence_segment.sentence_segment()
-    segmenter.sentence = thai_segmenter.sentence_segment.sentence
-    segmenter.vtb = thai_segmenter.sentence_segment.vtb
+    if not callable(header_detect_fun):
+        header_detect_fun = is_head_line
 
     num_lines = num_headers = num_sentences = num_tokens = 0
 
@@ -238,7 +307,7 @@ def line_tokenize_and_tagger(lines, column=None, summary=None):
         if not line:
             continue
 
-        if is_head_line(line):
+        if has_headers and header_detect_fun(line):
             num_headers += 1
             yield line
             continue
@@ -300,7 +369,7 @@ def run_sentence_segmentation(args):
 
     summary = dict() if args.collect_stats else None
 
-    for line in line_sentence_segmenter(infile, summary):
+    for line in line_sentence_segmenter(infile, summary=summary):
         outfile.write(line + "\n")
 
     if args.collect_stats:
@@ -312,7 +381,7 @@ def run_tokenize(args):
 
     summary = dict() if args.collect_stats else None
 
-    for line in line_tokenizer(infile, args.column, summary):
+    for line in line_tokenizer(infile, column=args.column, summary=summary):
         outfile.write(line + "\n")
 
     if args.collect_stats:
@@ -324,7 +393,7 @@ def run_tokenize_postag(args):
 
     summary = dict() if args.collect_stats else None
 
-    for line in line_tokenize_and_tagger(infile, args.column, summary):
+    for line in line_tokenize_and_tagger(infile, column=args.column, summary=summary):
         outfile.write(line + "\n")
 
     if args.collect_stats:
