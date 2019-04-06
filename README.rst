@@ -77,11 +77,41 @@ To use the project:
 
 .. code-block:: python
 
-    import thai_segmenter
-    # WIP
+    sentence = """foo bar 1234"""
+
+    # [A] Sentence Segmentation
+    from thai_segmenter.tasks import sentence_segment
+    sentences = sentence_segment(sentence)
+
+    for sentence in sentences:
+        print(str(sentence))
+
+    # [B] Lexeme Tokenization
+    from thai_segmenter.tasks import tokenize
+    tokens = tokenize(sentence)
+    for token in tokens:
+        print(token, end=" ", flush=True)
+
+    # [C] POS Tagging
+    from thai_segmenter.tasks import tokenize_and_postag
+    sentence_info = tokenize_and_postag(sentence)
+    for token, pos in sentence_info.pos:
+        print("{}|{}".format(token, pos), end=" ", flush=True)
 
 
-This project provides a nifty commandline tool ``thai-segmenter``:
+See more possibilities in ``tasks.py`` or ``cli.py``.
+
+Streaming larger sequences can be achieved like this:
+
+.. code-block:: python
+
+    # Streaming
+    sentences = ["sent1\n", "sent2\n", "sent3"]  # or any iterable (like File)
+    from thai_segmenter.tasks import line_sentence_segmenter
+    sentences_segmented = line_sentence_segmenter(sentences)
+
+
+This project also provides a nifty commandline tool ``thai-segmenter`` that does most of the work for you:
 
 .. code-block:: bash
 
@@ -100,11 +130,22 @@ This project provides a nifty commandline tool ``thai-segmenter``:
         tokpos              Tokenize and POS-tag input lines.
 
 
+You can run sentence segmentation like this::
+
+    thai-segmenter sentseg -i input.txt -o output.txt
+
+or even pipe data::
+
+    cat input.txt | thai-segmenter sentseg > output.txt
+
+Use ``-h``/``--help`` to get more information about possible control flow options.
+
+
 You can run it somewhat interactively with::
 
     thai-segmenter tokpos --stats
 
-and standard input and output are used. Lines terminated with :kbd:`Enter` are immediatly processed and printed. Stop work with :kbd:`Control-d` and the ``--stats`` parameter will helpfully output some statistics.
+and standard input and output are used. Lines terminated with ``Enter`` are immediatly processed and printed. Stop work with key combination ``Ctrl`` + ``D`` and the ``--stats`` parameter will helpfully output some statistics.
 
 
 Development
@@ -135,7 +176,7 @@ To run the all tests run::
 
     tox
 
-You can also optionally run :command:`pytest` alone::
+You can also optionally run ``pytest`` alone::
 
     pytest
 
