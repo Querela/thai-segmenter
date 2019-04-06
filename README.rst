@@ -48,15 +48,15 @@ Overview
 This package provides utilities for Thai sentence segmentation, word tokenization and POS tagging.
 Because of how sentence segmentation is performed, prior tokenization and POS tagging is required and therefore also provided with this package.
 
-Besides functions for doing sentence segmentation, tokenization, tokenization with pos tagging for single sentence strings,
+Besides functions for doing sentence segmentation, tokenization, tokenization with POS tagging for single sentence strings,
 there are also functions for working with large amounts of data in a streaming fashion.
-They are also accessible with a commandline script `thai-segmenter` that accepts file or standard in/output.
+They are also accessible with a commandline script ``thai-segmenter`` that accepts file or standard in/output.
 Options allow working with meta-headers or tabulator separated data files.
 
 The main functionality for sentence segmentation was extracted, reformatted and slightly rewritten from another project, 
 `Question Generation Thai <https://github.com/myscloud/Question-Generation-Thai>`_.
 
-`LongLexTo` is used as state-of-the-art word/lexeme tokenizer. An implementation was packaged in the above project but there are also versions `here <https://github.com/telember/lexto>`_ and `here <http://www.sansarn.com/lexto/>`_. To better use it in bulk processing in Python, it has been rewritten from Java to pure Python.
+**LongLexTo** is used as state-of-the-art word/lexeme tokenizer. An implementation was packaged in the above project but there are also (*original?*) versions `github <https://github.com/telember/lexto>`_ and `homepage <http://www.sansarn.com/lexto/>`_. To better use it for bulk processing in Python, it has been rewritten from Java to pure Python.
 
 For POS tagging a Viterbi-Model with the annotated Orchid-Corpus is used, `paper <https://www.researchgate.net/profile/Virach_Sornlertlamvanich/publication/2630580_Building_a_Thai_part-of-speech_tagged_corpus_ORCHID/links/02e7e514db19a98619000000/Building-a-Thai-part-of-speech-tagged-corpus-ORCHID.pdf>`_.
 
@@ -78,9 +78,10 @@ To use the project:
 .. code-block:: python
 
     import thai_segmenter
+    # WIP
 
 
-This project provides a nifty commandline tool `thai-segmenter`:
+This project provides a nifty commandline tool ``thai-segmenter``:
 
 .. code-block:: bash
 
@@ -103,7 +104,7 @@ You can run it somewhat interactively with::
 
     thai-segmenter tokpos --stats
 
-and standard input and output are used. Lines terminated with ``Enter`` are immediatly processed and printed. Stop work with ``Ctrl``+``D`` and the ``--stats`` parameter will helpfully output some statistics.
+and standard input and output are used. Lines terminated with :kbd:`Enter` are immediatly processed and printed. Stop work with :kbd:`Control-d` and the ``--stats`` parameter will helpfully output some statistics.
 
 
 Development
@@ -124,7 +125,7 @@ And check it afterwards with::
 
     flake8 <file>.py
 
-The `setup.py` also contains the `flake8` subcommand as well as an extended `clean` command.
+The ``setup.py`` also contains the ``flake8`` subcommand as well as an extended ``clean`` command.
 
 
 Tests
@@ -134,7 +135,7 @@ To run the all tests run::
 
     tox
 
-You can also optionally run `pytest` alone::
+You can also optionally run :command:`pytest` alone::
 
     pytest
 

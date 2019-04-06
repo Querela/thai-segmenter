@@ -31,6 +31,7 @@ class word_processing:
         self.special = {
             " ": "<space>",
             "-": "<minus>",
+            "_": "<underscore>",
             "(": "<left_parenthesis>",
             ")": "<right_parenthesis>",
             "[": "<left_bracket>",
