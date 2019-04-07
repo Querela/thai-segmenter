@@ -82,12 +82,21 @@ def sentence_segment(sentence, segmenter=None):
     return segmenter.sentence_segment(sentence)
 
 
-def tokenize(sentence, segmenter=None):
+def tokenize(sentence, segmenter=None, escaped=False, subwords=False):
     segmenter = _get_segmenter_default(segmenter)
 
     words = segmenter.wp.word_segment_words(sentence)
+    if not escaped and not subwords:
+        # return words if only word segmentation needed
+        return words
+
     words_escd = segmenter.wp.clean_special_characters(words)
+    if not subwords:
+        # return escaped words to see special characters?
+        return words_escd
+
     _, tokens, _ = segmenter.clean_unknown_word(words_escd)
+    # return subwords (probably mostly names (entities))
     return tokens
 
 
@@ -113,8 +122,9 @@ def tokenize_and_postag(sentence, segmenter, tri_gram=False):
     pos = segmenter.invert_unknown_word(tokens, path, replace_idx)
 
     # make sentence object
-    tokens_and_pos = list((w, p if p != "SBS" else "NSBS") for w, p in zip(tokens, pos))
-    return sentence_cls(sentence, tokens_and_pos)
+    # TODO: (only for research) check if tokens and words are different (tokens should be more)
+    words_and_pos = list((w, p if p != "SBS" else "NSBS") for w, p in zip(words, pos))
+    return sentence_cls(sentence, words_and_pos)
 
 
 # ----------------------------------------------------------------------------
@@ -260,7 +270,13 @@ def line_sentence_segmenter_column(
 
 
 def line_tokenizer(
-    lines, column=None, has_headers=False, header_detect_fun=None, summary=None
+    lines,
+    escape_special=False,
+    tokenize_subwords=False,
+    column=None,
+    has_headers=False,
+    header_detect_fun=None,
+    summary=None,
 ):
     segmenter = get_segmenter()
 
@@ -292,7 +308,9 @@ def line_tokenizer(
             main_part = line
 
         # tokenize
-        tokens = tokenize(main_part, segmenter)
+        tokens = tokenize(
+            main_part, segmenter, escaped=escape_special, subwords=tokenize_subwords
+        )
 
         num_sentences += 1
         num_tokens += len(tokens)

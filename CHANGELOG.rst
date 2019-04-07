@@ -2,6 +2,15 @@
 Changelog
 =========
 
+0.4.1 (2019-04-08)
+------------------
+
+* Fix tokenization / tokenization + POS tagging: return words instead of subwords
+* Add ``--escape-special`` and ``--subwords`` parameter to CLI script for tokenization.
+  Allows tokenization to further tokenize unknown words (e. g. names)
+  as well as escape special characters with angle bracket entities.
+
+
 0.4.0 (2019-04-08)
 ------------------
 

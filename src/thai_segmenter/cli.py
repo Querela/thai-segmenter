@@ -61,7 +61,13 @@ def run_tokenize(args):
 
     summary = dict() if args.collect_stats else None
 
-    for line in line_tokenizer(infile, column=args.column, summary=summary):
+    for line in line_tokenizer(
+        infile,
+        escape_special=args.escape_special,
+        tokenize_subwords=args.subwords,
+        column=args.column,
+        summary=summary,
+    ):
         outfile.write(line + "\n")
 
     if args.collect_stats:
@@ -186,7 +192,19 @@ def build_parser():
 
     # ------------------------------------
 
-    parser_tokenize.add_argument("--foo", help="WIP")
+    group = parser_tokenize.add_argument_group("Transformations")
+    group.add_argument(
+        "--escape-special",
+        action="store_true",
+        dest="escape_special",
+        help="Escape special tokens with angle brackets.",
+    )
+    group.add_argument(
+        "--subwords",
+        action="store_true",
+        dest="subwords",
+        help="Tokenize entities(?) (names etc.) into subwords.",
+    )
 
     # ------------------------------------
 
