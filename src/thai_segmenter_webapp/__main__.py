@@ -1,16 +1,29 @@
-from thai_segmenter_webapp.app import app
+from thai_segmenter_webapp.app import create_app
 
 
 def main():
-    # app.run(); import sys; sys.exit()  # if not with gevent
+    app = create_app()
+
+    app.logger.info("Routes: {}".format(app.url_map))
+    app.logger.debug("Config: {}".format(app.config))
+
+    if app.config["TESTING"]:
+        # if not with gevent
+        app.logger.warning("Run in TESTING mode ...")
+
+        app.run()
+        raise SystemExit("TESTING END")
 
     try:
         # use gevent if it exists, else default run it stupid ...
         from gevent.pywsgi import WSGIServer
 
-        app.config["TESTING"] = False
-        app.config["DEBUG"] = False
-        http_server = WSGIServer(("", 8999), app)
+        http_server = WSGIServer((app.config["HOST"], app.config["PORT"]), app)
+        print(
+            "Run WSGIServer listening on < {}:{} > ... (Press Ctrl+C to quit.)".format(
+                app.config["HOST"], app.config["PORT"]
+            )
+        )
         http_server.serve_forever()
     except ImportError:
         app.logger.warning("No gevent found. Run really simple ...")

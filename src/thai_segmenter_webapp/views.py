@@ -1,9 +1,9 @@
 import logging
 from functools import lru_cache
 
+from flask import current_app as app
 from flask import render_template
 from flask import request
-from thai_segmenter_webapp.app import app
 from thai_segmenter_webapp.app import sentseg
 from thai_segmenter_webapp.segmenter import dump_tree_pos_info
 from thai_segmenter_webapp.segmenter import make_tree_for_output
@@ -12,7 +12,7 @@ from thai_segmenter_webapp.segmenter import make_tree_pos_info
 # ----------------------------------------------------------------------------
 
 
-@app.route("/", methods=["GET", "POST"])
+# @app.route("/", methods=["GET", "POST"])
 def view_index():
     if request.method == "POST":
         form = request.form

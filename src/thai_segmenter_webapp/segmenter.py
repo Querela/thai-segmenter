@@ -23,14 +23,17 @@ class SentenceSegmenter(object):
             base_config.update(self.config)
         if config:
             base_config.update(config)
-        config = base_config
+
+        self.config = base_config
+        self.app = app
+
         self.init_segmenter()
 
     def init_segmenter(self):
         self.app.logger.debug("Init sentence segmenter")
-        import thai_segmenter.sentence_segment as _ss
+        import thai_segmenter.sentence_segmenter as _ss
 
-        self._ss = _ss.sentence_segment()  # get segmenter class instance
+        self._ss = _ss.sentence_segmenter()  # get segmenter class instance
         self._ss.sentence = _ss.sentence  # add module as reference
         self._ss.vtb = _ss.vtb  # add module as reference
         self.app.logger.debug("Sentence segmenter inited.")
