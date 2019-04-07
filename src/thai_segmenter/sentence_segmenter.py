@@ -11,7 +11,7 @@ from thai_segmenter import viterbi as vtb
 from thai_segmenter import word_processing as wp
 
 
-class sentence_segment:
+class sentence_segmenter:
     data_dir = "tools"
     filename_lexitron = "lexitron_original.txt"
     filename_dictionary = "custom_dict_word.txt"
@@ -26,16 +26,16 @@ class sentence_segment:
         if custom_dict is not None:
             self.set_custom_dict(custom_dict)
         else:
-            self.dict_name = sentence_segment.filename_lexitron
+            self.dict_name = sentence_segmenter.filename_lexitron
 
-        self.wp = wp.word_processing(self.dict_name, sentence_segment.filename_orchid)
+        self.wp = wp.word_processing(self.dict_name, sentence_segmenter.filename_orchid)
 
     def set_custom_dict(self, custom_dict):
         word_list = set()
         filename = os.path.join(
             os.path.dirname(__file__),
-            sentence_segment.data_dir,
-            sentence_segment.filename_lexitron,
+            sentence_segmenter.data_dir,
+            sentence_segmenter.filename_lexitron,
         )
         with codecs.open(filename, "r", encoding="utf-8") as f:
             for line in f:
@@ -45,13 +45,13 @@ class sentence_segment:
 
         filename = os.path.join(
             os.path.dirname(__file__),
-            sentence_segment.data_dir,
-            sentence_segment.filename_dictionary,
+            sentence_segmenter.data_dir,
+            sentence_segmenter.filename_dictionary,
         )
         with codecs.open(filename, "w", encoding="utf-8") as f:
             for word in word_list:
                 f.write(word + "\n")
-        self.dict_name = sentence_segment.filename_dictionary
+        self.dict_name = sentence_segmenter.filename_dictionary
 
     def clean_unknown_word(self, sentence):
         new_word_list = list()

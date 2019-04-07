@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.3.3 (2019-04-07)
+------------------
+
+* Fix duplicate names (class/method for ``sentence_segment``), rename class to ``sentence_segmenter`` (``.py``).
+
+
 0.3.2 (2019-04-07)
 ------------------
 
