@@ -290,6 +290,8 @@ setup(
     # $ prospector
     # mypy / pytype ?
     # $ python setup.py check -r -s
+    # $ python setup.py sdist
+    # $ twine upload --verbose --skip-existing dist/*.gz
     extras_require={
         # eg:
         #   'rst': ['docutils>=0.11'],
@@ -303,6 +305,7 @@ setup(
             "pytest-cov",
             "pytest-mock",
             "readme_renderer",
+            "twine",
             # 'coverage',
         ]
     },

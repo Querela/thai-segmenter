@@ -2,6 +2,14 @@
 Changelog
 =========
 
+0.3.2 (2019-04-07)
+------------------
+
+* Add ``twine`` to extras dependencies.
+* Publish module on **PyPI**. (Only ``sdist``, ``bdist_wheel`` can't be built currently.)
+* Fix some TravisCI warnings.
+
+
 0.3.1 (2019-04-07)
 ------------------
 

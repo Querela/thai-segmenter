@@ -12,7 +12,7 @@ Overview
         | |coveralls|
     * - package
       - | |version| |wheel| |supported-versions| |supported-implementations|
-        | |commits-since|
+        | |license| |commits-since|
 
 .. |travis| image:: https://travis-ci.org/Querela/thai-segmenter.svg?branch=master
     :alt: Travis-CI Build Status
@@ -25,6 +25,10 @@ Overview
 .. |version| image:: https://img.shields.io/pypi/v/thai-segmenter.svg
     :alt: PyPI Package latest release
     :target: https://pypi.org/project/thai-segmenter
+
+.. |license| image:: https://img.shields.io/pypi/l/thai-segmenter.svg
+    :alt: PyPI - License
+    :target: https://github.com/Querela/thai-segmenter/blob/master/LICENSE
 
 .. |commits-since| image:: https://img.shields.io/github/commits-since/Querela/thai-segmenter/v0.3.1.svg
     :alt: Commits since latest release
