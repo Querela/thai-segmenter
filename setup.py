@@ -307,8 +307,14 @@ setup(
             "readme_renderer",
             "twine",
             # 'coverage',
+        ],
+        "webapp": ["Flask", "gevent"],
+    },
+    entry_points={
+        "console_scripts": [
+            "thai-segmenter = thai_segmenter.cli:main",
+            "thai-segmenter-webapp = thai_segmenter_webapp.__main__:main [webapp]",
         ]
     },
-    entry_points={"console_scripts": ["thai-segmenter = thai_segmenter.cli:main"]},
     cmdclass={"clean": CleanCommand, "pylint": PylintCommand},
 )
