@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.4.0 (2019-04-08)
+------------------
+
+* Add demo webapp with sentence segmentation.
+  (NOTE: Running both the webapp and (batch) sentence segmentation at the same time from the same installation is not recommeded. It can have unexpected side-effects.)
+
+
 0.3.3 (2019-04-07)
 ------------------
 

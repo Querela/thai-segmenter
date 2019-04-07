@@ -154,6 +154,33 @@ You can run it somewhat interactively with::
 and standard input and output are used. Lines terminated with ``Enter`` are immediatly processed and printed. Stop work with key combination ``Ctrl`` + ``D`` and the ``--stats`` parameter will helpfully output some statistics.
 
 
+WebApp
+------
+
+The project also provides a demo WebApp that can be installed with::
+
+    pip install -e .[webapp]
+
+and then run with::
+
+    thai-segmenter-webapp
+
+Consider running it in a ``screen`` session.
+
+.. code-block:: bash
+
+    # create the screen detached and then attach
+    screen -dmS thai-senseg-webapp
+    screen -r thai-senseg-webapp
+
+    # in the screen:
+    thai-segmenter-webapp
+
+    # and detach with keys [Ctrl]+[D]
+
+Please note that it only is a demo webapp to test and visualize how the sentence segmentor works.
+
+
 Development
 ===========
 
