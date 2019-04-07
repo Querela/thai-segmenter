@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """App module + factory?
 
-see here: https://github.com/sloria/cookiecutter-flask/blob/master/%7B%7Bcookiecutter.app_name%7D%7D/%7B%7Bcookiecutter.app_name%7D%7D/app.py
+see here: https://github.com/sloria/cookiecutter-flask
+    /blob/master/%7B%7Bcookiecutter.app_name%7D%7D/%7B%7Bcookiecutter.app_name%7D%7D/app.py
 """
 from flask import Flask
 from thai_segmenter_webapp import default_config
