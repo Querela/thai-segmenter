@@ -1,6 +1,8 @@
 import re
 
-import thai_segmenter.sentence_segment
+import thai_segmenter.sentence_segmenter
+from thai_segmenter import viterbi as vtb
+from thai_segmenter.sentence import sentence as sentence_cls
 
 # ----------------------------------------------------------------------------
 
@@ -51,10 +53,10 @@ __segmenter = None
 
 
 def get_segmenter():
-    segmenter = thai_segmenter.sentence_segment.sentence_segment()
-    # TODO: maybe set in sentence_segment class
-    segmenter.sentence = thai_segmenter.sentence_segment.sentence
-    segmenter.vtb = thai_segmenter.sentence_segment.vtb
+    segmenter = thai_segmenter.sentence_segmenter.sentence_segmenter()
+    # TODO: maybe set in sentence_segmenter class
+    # segmenter.sentence = thai_segmenter.sentence_segmenter.sentence
+    # segmenter.vtb = thai_segmenter.sentence_segmenter.vtb
 
     return segmenter
 
@@ -101,18 +103,18 @@ def tokenize_and_postag(sentence, segmenter, tri_gram=False):
     # call viterbi function to get most possible pos sequence
     initp, trans, emiss = segmenter.corpus.get_statistics_model(tri_gram)
     if tri_gram:
-        path = segmenter.vtb.viterbi_trigram(
+        path = vtb.viterbi_trigram(
             to_be_tagged, segmenter.corpus.pos_list_sentence, initp, trans, emiss
         )
     else:
-        path = segmenter.vtb.viterbi(
+        path = vtb.viterbi(
             to_be_tagged, segmenter.corpus.pos_list_sentence, initp, trans, emiss
         )
     pos = segmenter.invert_unknown_word(tokens, path, replace_idx)
 
     # make sentence object
     tokens_and_pos = list((w, p if p != "SBS" else "NSBS") for w, p in zip(tokens, pos))
-    return segmenter.sentence.sentence(sentence, tokens_and_pos)
+    return sentence_cls(sentence, tokens_and_pos)
 
 
 # ----------------------------------------------------------------------------
@@ -191,7 +193,7 @@ def line_sentence_segmenter(
             continue
 
         # sentence segment
-        sentences = segmenter.sentence_segment(line)
+        sentences = sentence_segment(line, segmenter)
         if len(sentences) > 1:
             num_segmented += 1
         num_sentences += len(sentences)
@@ -239,7 +241,7 @@ def line_sentence_segmenter_column(
             main_part = line
 
         # sentence segment
-        sentences = segmenter.sentence_segment(main_part)
+        sentences = sentence_segment(main_part, segmenter)
         if len(sentences) > 1:
             num_segmented += 1
         num_sentences += len(sentences)

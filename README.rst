@@ -30,9 +30,9 @@ Overview
     :alt: PyPI - License
     :target: https://github.com/Querela/thai-segmenter/blob/master/LICENSE
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/Querela/thai-segmenter/v0.3.2.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/Querela/thai-segmenter/v0.3.3.svg
     :alt: Commits since latest release
-    :target: https://github.com/Querela/thai-segmenter/compare/v0.3.2...master
+    :target: https://github.com/Querela/thai-segmenter/compare/v0.3.3...master
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/thai-segmenter.svg
     :alt: PyPI Wheel
