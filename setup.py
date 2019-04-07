@@ -219,7 +219,7 @@ def read(*names, **kwargs):
 
 setup(
     name="thai-segmenter",
-    version="0.3.1",
+    version="0.3.2",
     license="MIT license",
     description="Thai tokenizer, POS-tagger and sentence segmenter.",
     long_description="{readme}\n{changelog}".format(
