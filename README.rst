@@ -46,8 +46,8 @@ Overview
     :alt: Supported implementations
     :target: https://pypi.org/project/thai-segmenter
 
-
 .. end-badges
+
 
 This package provides utilities for Thai sentence segmentation, word tokenization and POS tagging.
 Because of how sentence segmentation is performed, prior tokenization and POS tagging is required and therefore also provided with this package.
@@ -66,6 +66,7 @@ For POS tagging a Viterbi-Model with the annotated Orchid-Corpus is used, `paper
 
 * Free software: MIT license
 
+
 Installation
 ============
 
@@ -73,9 +74,9 @@ Installation
 
     pip install thai-segmenter
 
+
 Documentation
 =============
-
 
 To use the project:
 
@@ -117,6 +118,9 @@ Streaming larger sequences can be achieved like this:
     sentences_segmented = line_sentence_segmenter(sentences)
 
 
+Commandline tool
+----------------
+
 This project also provides a nifty commandline tool ``thai-segmenter`` that does most of the work for you:
 
 .. code-block:: bash
@@ -157,11 +161,11 @@ and standard input and output are used. Lines terminated with ``Enter`` are imme
 WebApp
 ------
 
-The project also provides a demo WebApp that can be installed with::
+The project also provides a demo WebApp (using ``Flask`` and ``gevent``) that can be installed with::
 
     pip install -e .[webapp]
 
-and then run with::
+and then simply run (in the foreground)::
 
     thai-segmenter-webapp
 
@@ -178,7 +182,7 @@ Consider running it in a ``screen`` session.
 
     # and detach with keys [Ctrl]+[D]
 
-Please note that it only is a demo webapp to test and visualize how the sentence segmentor works.
+*Please note that it only is a demo webapp to test and visualize how the sentence segmentor works.*
 
 
 Development

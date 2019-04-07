@@ -7,6 +7,7 @@ Changelog
 
 * Add demo webapp with sentence segmentation.
   (NOTE: Running both the webapp and (batch) sentence segmentation at the same time from the same installation is not recommeded. It can have unexpected side-effects.)
+* Some reformat of ``README.rst``
 
 
 0.3.3 (2019-04-07)
