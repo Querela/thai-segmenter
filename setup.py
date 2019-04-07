@@ -188,6 +188,7 @@ class PylintCommand(Command):
             # command.append('**/*.py')
 
         self.announce("Running command: %s" % str(command), level=distutils.log.INFO)
+        # TODO: self.spawn(command, dry_run=self.dry_run)
         try:
             subprocess.check_call(" ".join(command), shell=True)
         except subprocess.CalledProcessError as cpe:

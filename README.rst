@@ -81,19 +81,21 @@ To use the project:
 
     # [A] Sentence Segmentation
     from thai_segmenter.tasks import sentence_segment
+    # or even easier:
+    from thai_segmenter import sentence_segment
     sentences = sentence_segment(sentence)
 
     for sentence in sentences:
         print(str(sentence))
 
     # [B] Lexeme Tokenization
-    from thai_segmenter.tasks import tokenize
+    from thai_segmenter import tokenize
     tokens = tokenize(sentence)
     for token in tokens:
         print(token, end=" ", flush=True)
 
     # [C] POS Tagging
-    from thai_segmenter.tasks import tokenize_and_postag
+    from thai_segmenter import tokenize_and_postag
     sentence_info = tokenize_and_postag(sentence)
     for token, pos in sentence_info.pos:
         print("{}|{}".format(token, pos), end=" ", flush=True)
@@ -106,8 +108,8 @@ Streaming larger sequences can be achieved like this:
 .. code-block:: python
 
     # Streaming
-    sentences = ["sent1\n", "sent2\n", "sent3"]  # or any iterable (like File)
-    from thai_segmenter.tasks import line_sentence_segmenter
+    sentences = ["sent1\n", "sent2\n", "sent3\n"]  # or any iterable (like File)
+    from thai_segmenter import line_sentence_segmenter
     sentences_segmented = line_sentence_segmenter(sentences)
 
 
