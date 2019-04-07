@@ -16,7 +16,6 @@ from thai_segmenter.tasks import sentence_segment
 from thai_segmenter.tasks import tokenize
 from thai_segmenter.tasks import tokenize_and_postag
 
-
 __all__ = [
     "contains_thai",
     "is_head_line",
