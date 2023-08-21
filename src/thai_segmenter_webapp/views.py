@@ -4,6 +4,7 @@ from functools import lru_cache
 from flask import current_app as app
 from flask import render_template
 from flask import request
+
 from thai_segmenter_webapp.app import sentseg
 from thai_segmenter_webapp.segmenter import dump_tree_pos_info
 from thai_segmenter_webapp.segmenter import make_tree_for_output
@@ -36,8 +37,8 @@ def view_index():
 @lru_cache(maxsize=100)
 def process_text(text):
     lines = text.split("\n")
-    lines = [l.strip() for l in lines]
-    lines = [l for l in lines if l]
+    lines = [line.strip() for line in lines]
+    lines = [line for line in lines if line]
 
     all_sentences = list()
     for nr, line in enumerate(lines, 1):

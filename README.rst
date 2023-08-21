@@ -197,6 +197,7 @@ To install the package for development::
 
 After changing the source, run auto code formatting with::
 
+    isort <file>.py
     black <file>.py
 
 And check it afterwards with::

@@ -298,9 +298,11 @@ setup(
         #   ':python_version=="2.6"': ['argparse'],
         "dev": [
             "bumpversion",
+            "black",
             "flake8",
             "pylint",
             "pyment",
+            "tox",
             "pytest",
             "pytest-cov",
             "pytest-mock",
