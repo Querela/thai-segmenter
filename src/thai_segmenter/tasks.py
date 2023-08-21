@@ -100,7 +100,7 @@ def tokenize(sentence, segmenter=None, escaped=False, subwords=False):
     return tokens
 
 
-def tokenize_and_postag(sentence, segmenter, tri_gram=False):
+def tokenize_and_postag(sentence, segmenter=None, tri_gram=False):
     segmenter = _get_segmenter_default(segmenter)
 
     # tokenize
