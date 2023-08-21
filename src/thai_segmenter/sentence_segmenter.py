@@ -101,7 +101,7 @@ class sentence_segmenter:
 
         for idx in reverse_idx:
             start, end = idx[0], idx[1]
-            original_word = "".join(broken_words[start:(end + 1)])
+            original_word = "".join(broken_words[start : (end + 1)])
             if (
                 original_word in self.custom_dict
                 and self.custom_dict[original_word]["pos"] is not None

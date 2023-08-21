@@ -105,12 +105,14 @@ class Trie(object):
 
     def add(self, string):
         """Adds the string to the trie.
-        Returns true if the string is added or false if the string is already contained in the trie."""
+        Returns true if the string is added or false if the string is already contained in the trie.
+        """
         return self._add(string, 0)
 
     def _add(self, string, index=0):
         """[Internal function] Adds the string to the trie.
-        Returns true if the string is added or false if the string is already contained in the trie."""
+        Returns true if the string is added or false if the string is already contained in the trie.
+        """
         if index == len(string):
             if self.is_word:
                 return False
@@ -180,7 +182,8 @@ class Trie(object):
 
     def get_words(self, string):
         """Returns all of the words in the trie that begin with the specified prefix rooted at this node.
-        An array of length 0 is returned if there are no words that begin with the specified prefix."""
+        An array of length 0 is returned if there are no words that begin with the specified prefix.
+        """
         trie = self._get_node(string)
         if trie is None:
             return list()
@@ -384,7 +387,8 @@ class LongLexTo(object):
 
     def __init__(self, dict_file="lexitron.txt", raise_errors=False):
         """Constructor with an (optional default) dictionary file.
-        Set raise_errors to True if you want Python to raise Exceptions instead of stderr messages."""
+        Set raise_errors to True if you want Python to raise Exceptions instead of stderr messages.
+        """
         self._lock = threading.RLock()  # to block concurrent access
 
         self.dict_file = dict_file

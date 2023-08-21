@@ -105,7 +105,6 @@ class orchid_corpus:
             self.corpus_sentence.append(p)
 
     def get_word_pos_list(self):
-
         for paragraph in self.corpus:
             for sentence in paragraph:
                 for word in sentence:
