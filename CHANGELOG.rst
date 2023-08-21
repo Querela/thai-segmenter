@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.4.2 (2023-08-23)
+------------------
+
+* Fix signature of ``tasks.tokenize_and_postag`` function
+* Update ``tox.ini`` to include newer python version, as well as older parameters and flags
+* Reformat und Lint
+
 0.4.1 (2019-04-08)
 ------------------
 
